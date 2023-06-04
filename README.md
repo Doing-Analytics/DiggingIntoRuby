@@ -12,8 +12,6 @@ DiggingIntoRuby
 
 **角色**: 獨立自主的後端工程師
 
-TedxTed 後端工程師
-
 **聯繫方式**: [wodf410@gmail.com](mailto:wodf410@gmail.com)
 
 **Github**：[點此訪問](https://github.com/TedxTed)
@@ -24,13 +22,19 @@ TedxTed 後端工程師
 
 **角色**: 五倍紅寶石程式教育機構的後端工程師
 
-cacachang是一位來自五倍紅寶石程式教育機構的後端工程師，他擁有豐富的教育經驗和深厚的技術背景。
-
 **聯繫方式**: [a24701770@gmail.com](mailto:a24701770@gmail.com)
 
 **Github**：[點此訪問](https://github.com/cacachang)
 
 ### digging-1 
+
+ ```shell
+ cd digging-1
+ bundle
+ 
+ rspec spec/lib/topic_spec.rb   
+ rspec spec/lib/ruby_topic_spec.rb
+ ```
 
 物件模型和繼承鏈。
 - [默默會活動](https://www.accupass.com/event/2305290354554785462080)
