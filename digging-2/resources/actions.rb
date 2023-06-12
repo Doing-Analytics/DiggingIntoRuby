@@ -1,10 +1,10 @@
 module Resources
-  module Acctions
+  module Actions
     Actions = {
-      go: proc do |player, location|
-        if locations.include?(location)
-          puts locations[location][:description]
-          locations[location][:event].call(player)
+      go: proc do |player, destination, locations|
+        if locations.include?(destination)
+          puts locations[destination][:description]
+          locations[destination][:event].call(player)
         else
           puts '你不能去那裡！'
         end
@@ -26,10 +26,19 @@ module Resources
         else
           puts '你的攻擊失敗了！'
         end
+      end,
+      exit: proc do
+        puts '你想要退出游戏吗？（y/n）'
+        choice = gets.chomp.downcase
+
+        if choice == 'y'
+          puts '遊戲結束 (power of ning x ted)'
+          exit
+        end
       end
-      # 可以添加更多的行動...
+
     }
-    def self.get_location
+    def self.get_actions
       Actions
     end
   end
