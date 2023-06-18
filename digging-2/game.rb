@@ -32,9 +32,34 @@ class GameCharacter
   end
 end
 
-hero = GameCharacter.new('Hero', 100, 50, 20, 10) # GameCharacter 是一個常量，hero 是我們新創建的物件， hero 就是 self
+hero = GameCharacter.new('pikachu', 100, 50, 20, 10) # GameCharacter 是一個常量，hero 是我們新創建的物件， hero 就是 self
 hero.increase_strength # 我們正在執行hero (self) 的 increase_strength 方法
 hero.print_status # 我們正在執行 hero (self) 的 print_status 方法，會印出 "Hero - health: 100, strength: 60"
+
+COMBATANT_ATTACK_WAY = {
+  cute_attack: proc {
+    combatant_info = { defense: 10 }.tap do |info|
+      if rand < 0.7
+        p '可愛攻擊！'
+        info[:attack_power] = 70
+      else
+        p '對方更可愛，攻擊減弱'
+        info[:attack_power] = 30
+      end
+    end
+  },
+  thunder_bolt: proc {
+    combatant_info = { defense: 10 }.tap do |info|
+      if rand < 0.7
+        p '十萬伏特'
+        info[:attack_power] = 40
+      else
+        p '超弱十萬伏特'
+        info[:attack_power] = 10
+      end
+    end
+  }
+}
 
 @combatant_info = {
   attack_power: '111',
@@ -43,10 +68,7 @@ hero.print_status # 我們正在執行 hero (self) 的 print_status 方法，會
 
 hero.attack_model do |default_combatant|
   default_combatant.merge(
-    {
-      attack_power: 30,
-      defense: 10
-    }
+    COMBATANT_ATTACK_WAY[:cute_attack].call
   )
 end
 
