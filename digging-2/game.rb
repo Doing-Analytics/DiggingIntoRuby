@@ -1,13 +1,16 @@
+require 'byebug'
+
 class GameCharacter
-  attr_accessor :name, :health, :strength, :defense, :attack_power, :combatant_info
+  attr_accessor :name, :health, :strength, :defense, :attack_power, :max_health, :specfic_power
 
   def initialize(name, health, strength, defense, attack_power)
     @name = name        # self 的 @name 實例變量
+    @max_health = health
     @health = health    # self 的 @health 實例變量
     @strength = strength # self 的 @strength 實例變量
     @defense = defense
     @attack_power = attack_power
-    @combatant_info = {}
+    @specfic_power = ['super health']
   end
 
   def increase_strength
@@ -23,11 +26,31 @@ class GameCharacter
       attack_power: 40,
       defense: 20
     }
-    @combatant_info = block_given? ? yield(default_combatant) : default_combatant
+    combatant_info = block_given? ? yield(default_combatant) : default_combatant
 
-    return unless @defense < @combatant_info[:attack_power]
+    return unless @defense < combatant_info[:attack_power]
 
-    @health -= (@combatant_info[:attack_power] - @defense)
+    @health -= (combatant_info[:attack_power] - @defense)
+    print_status
+  end
+
+  def heal(&block)
+    p block
+    handle_heal_event(block) if block_given?
+  end
+
+  private
+
+  def handle_heal_event(block)
+    return if @health >= @max_health
+
+    p block.call
+    healing_amount = block.call.call(specfic_power)
+    @health += healing_amount
+    @health = @max_health if @health > @max_health
+
+    puts "#{@name} has been healed by #{healing_amount} points. Current health: #{@health}"
+
     print_status
   end
 end
@@ -61,6 +84,17 @@ COMBATANT_ATTACK_WAY = {
   }
 }
 
+HEALTH_OBJECT = {
+  big_treatment: lambda do |power|
+    p '強治癒'
+    power.include?('super health') ? 50 : 30
+  end,
+  mild_treatment: lambda do
+    p '普通治癒'
+    rand < 0.9 ? 10 : 5
+  end
+}
+
 @combatant_info = {
   attack_power: '111',
   defense: '222'
@@ -73,3 +107,5 @@ hero.attack_model do |default_combatant|
 end
 
 hero.attack_model
+
+hero.heal { HEALTH_OBJECT[:big_treatment] }
