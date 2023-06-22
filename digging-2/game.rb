@@ -1,111 +1,66 @@
 require 'byebug'
+require_relative 'combatant'
+require_relative 'health'
 
 class GameCharacter
-  attr_accessor :name, :health, :strength, :defense, :attack_power, :max_health, :specfic_power
+  attr_accessor :name, :health, :defense, :attack_power, :max_health, :specfic_power
 
-  def initialize(name, health, strength, defense, attack_power)
-    @name = name        # self 的 @name 實例變量
+  def initialize(name, health,  defense, attack_power)
+    @name = name
     @max_health = health
-    @health = health    # self 的 @health 實例變量
-    @strength = strength # self 的 @strength 實例變量
+    @health = health
     @defense = defense
     @attack_power = attack_power
     @specfic_power = ['super health']
   end
 
-  def increase_strength
-    @strength += 10 # 增加 self 的 @strength 實例變量
-  end
-
   def print_status
-    puts "#{name} - health: #{health}, strength: #{strength}" #  self 的 @name, @health, 和 @strength 實例變量
+    puts "#{name} - health: #{health}"
   end
 
   def attack_model
-    default_combatant = {
-      attack_power: 40,
-      defense: 20
-    }
-    combatant_info = block_given? ? yield(default_combatant) : default_combatant
+    combatant_info = block_given? ? yield : { attack_power: 50, defense: 10 }
 
     return unless @defense < combatant_info[:attack_power]
 
     @health -= (combatant_info[:attack_power] - @defense)
-    print_status
   end
 
-  def heal(&block)
-    p block
-    handle_heal_event(block) if block_given?
+  def perform_action(&block)
+    puts 'perform action'
+
+    call_action(block) if block_given?
   end
+
+  image.png
 
   private
 
-  def handle_heal_event(block)
-    return if @health >= @max_health
-
-    p block.call
-    healing_amount = block.call.call(specfic_power)
-    @health += healing_amount
-    @health = @max_health if @health > @max_health
-
-    puts "#{@name} has been healed by #{healing_amount} points. Current health: #{@health}"
-
-    print_status
+  def call_action(block)
+    block.call(self)
   end
 end
 
-hero = GameCharacter.new('pikachu', 100, 50, 20, 10) # GameCharacter 是一個常量，hero 是我們新創建的物件， hero 就是 self
-hero.increase_strength # 我們正在執行hero (self) 的 increase_strength 方法
-hero.print_status # 我們正在執行 hero (self) 的 print_status 方法，會印出 "Hero - health: 100, strength: 60"
+hero = GameCharacter.new('pikachu', 100, 20, 10)
+hero.print_status
 
-COMBATANT_ATTACK_WAY = {
-  cute_attack: proc {
-    combatant_info = { defense: 10 }.tap do |info|
-      if rand < 0.7
-        p '可愛攻擊！'
-        info[:attack_power] = 70
-      else
-        p '對方更可愛，攻擊減弱'
-        info[:attack_power] = 30
-      end
-    end
-  },
-  thunder_bolt: proc {
-    combatant_info = { defense: 10 }.tap do |info|
-      if rand < 0.7
-        p '十萬伏特'
-        info[:attack_power] = 40
-      else
-        p '超弱十萬伏特'
-        info[:attack_power] = 10
-      end
-    end
-  }
-}
-
-HEALTH_OBJECT = {
-  big_treatment: lambda do |power|
-    p '強治癒'
-    power.include?('super health') ? 50 : 30
-  end,
-  mild_treatment: lambda do
-    p '普通治癒'
-    rand < 0.9 ? 10 : 5
-  end
-}
-
-@combatant_info = {
-  attack_power: '111',
-  defense: '222'
-}
-
-hero.attack_model do |default_combatant|
-  default_combatant.merge(
-    COMBATANT_ATTACK_WAY[:cute_attack].call
-  )
+# 1 yield
+hero.attack_model do
+  Combatant.attack
 end
 
-hero.attack_model
+hero1 = GameCharacter.new('pika-1', 100, 20, 10)
+hero2 = GameCharacter.new('pika-2', 100, 20, 10)
+hero3 = GameCharacter.new('pika-3', 100, 20, 10)
 
-hero.heal { HEALTH_OBJECT[:big_treatment] }
+heroes = [hero1, hero2, hero3]
+
+heroes.each(&:attack_model)
+heroes.each(&:heal)
+
+# 3 &block
+
+hero.perform_action do |character|
+  character.health += 10
+  puts "#{character.name} has breakfast and increases health by 10. Current health: #{character.health}."
+end
